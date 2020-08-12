@@ -1,0 +1,44 @@
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: centos-deploy-ip-range
+spec:
+  selector:
+    matchLabels:
+      app: centos-svc
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: centos-svc
+      annotations:
+#        "cni.projectcalico.org/ipAddrs": "[\"192.168.2.0/24\"]"
+        "cni.projectcalico.org/ipv4pools": "[\"myself-pool\"]"
+    spec:
+      containers:
+      - name: centos-svc
+        image: registry.cn-beijing.aliyuncs.com/alexzhang/centos-full
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do echo hello; sleep 10;done"]
+        env:
+        - name: JAVA_OPTS
+          valueFrom:
+            configMapKeyRef:
+              name: configs
+              key: JAVA_OPTS
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: configs
+              key: LOG_LEVEL
+        - name: HTTP_PORT
+          value: "9987"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configs
+data:
+  JAVA_OPTS: -Xms1024m
+  LOG_LEVEL: DEBUG

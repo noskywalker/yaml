@@ -1,0 +1,13 @@
+apiVersion: crd.projectcalico.org/v1
+kind: IPPool
+metadata:
+  name: myself-pool
+spec:
+  blockSize: 29
+  cidr: 172.17.1.0/29
+  ipipMode: Always
+  natOutgoing: true
+  nodeSelector: all()
+  vxlanMode: Never
+#  计算子网划分和ip地址范围
+#  https://tool.520101.com/wangluo/ipjisuan/
